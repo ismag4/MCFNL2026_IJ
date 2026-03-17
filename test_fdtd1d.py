@@ -52,8 +52,5 @@ def test_fdtd_PEC_boundary_conditions():
     assert np.allclose(h_solved, h_expected)
 
 
-
-
-
 if __name__ == "__main__":
     pytest.main([__file__])
