@@ -6,11 +6,12 @@ C = 1.0
 class FDTD1D:
     def __init__(self, x):
         self.x = x
+        self.xH = (self.x[:1] + self.x[:-1]) / 2.0
         self.dx = x[1] - x[0]
-        self.dt = self.dx / C          # CFL = 1 → exact propagation
+        self.dt = self.dx / C  
         self.N = len(x)
         self.e = np.zeros(self.N)
-        self.h = np.zeros(self.N - 1)  # H lives at half-integer spatial nodes
+        self.h = np.zeros(self.N - 1) 
         self.t = 0.0
 
     def load_initial_field(self, e0):
