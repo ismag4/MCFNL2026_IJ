@@ -20,7 +20,7 @@ class FDTD1D:
         
     def _step(self):
         r = self.dt / self.dx
-        
+    
         self.e[1:-1] += r * (self.h[1:] - self.h[:-1])
 
         if self.boundaries is not None:
@@ -28,10 +28,13 @@ class FDTD1D:
                 self.e[0] = 0.0
             if self.boundaries[1] == 'PEC':
                 self.e[-1] = 0.0
+            if self.boundaries[0] == 'periodic':
+                self.e[0] += r * (self.h[0] - self.h[-1])
+                self.e[-1] = self.e[0]
 
         self.h += r * (self.e[1:] - self.e[:-1])
-        
-        self.t += self.dt
+    
+        self.t += self.dt   
 
     def run_until(self, t_final):
         n_steps = round((t_final - self.t) / self.dt)
