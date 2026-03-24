@@ -23,6 +23,7 @@ from pathlib import Path
 def make_animation(
     x,
     initial_field,
+    boundaries=('PEC', 'PEC'),
     t_final=2.0,
     n_frames=200,
     outfile="fdtd1d.gif",
@@ -33,7 +34,7 @@ def make_animation(
     # Default to placing output next to this script to avoid permission issues.
     outfile = str((Path(__file__).resolve().parent / outfile).resolve())
 
-    fdtd = FDTD1D(x)
+    fdtd = FDTD1D(x, boundaries)
     fdtd.load_initial_field(initial_field)
     # Initialize H to zero so it can be animated as well
     fdtd.load_initial_field(np.zeros_like(x[:-1]))
@@ -82,19 +83,27 @@ def make_animation(
 
 
 if __name__ == "__main__":
-    # Example usage: Gaussian pulse
     x = np.linspace(-1.0, 1.0, 201)
     x0 = 0.0
     sigma = 0.05
-    # Use a proper Gaussian peak (decays away from center)
     initial_e = np.exp(-0.5 * ((x - x0) / sigma) ** 2)
 
-    out = make_animation(
-        x,
-        initial_e,
-        t_final=2.0,
-        n_frames=200,
-        outfile="fdtd1d.gif",
-        show=True,
-    )
-    print(f"Saved animation: {out}")
+    scenarios = [
+        (('PEC', 'PEC'), 'fdtd1d_pec_pec.gif'),
+        (('PEC', 'ABC'), 'fdtd1d_pec_abc.gif'),
+    ]
+
+    for boundaries, filename in scenarios:
+        print(f"Generando animación para fronteras {boundaries} -> {filename}")
+        out = make_animation(
+            x,
+            initial_e,
+            boundaries=boundaries,
+            t_final=2.0,
+            n_frames=200,
+            outfile=filename,
+            show=False,
+        )
+        print(f"Guardado: {out}")
+
+    print("Listo: estructuras PEC y ABC generadas.")
