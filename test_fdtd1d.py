@@ -141,3 +141,5 @@ def test_fdtd_TF_SF():
     np.testing.assert_allclose(e_total, -initial_e, atol=1e-2)
     np.testing.assert_allclose(e_scattered, -2.0 * initial_e, atol=1e-2)
     np.testing.assert_allclose(h_scattered, -h_incident, atol=1e-2)
+
+
