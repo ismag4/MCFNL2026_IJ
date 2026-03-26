@@ -164,6 +164,41 @@ def test_fdtd_mur_boundary_conditions():
 
     assert np.allclose(e_solved, 0.0, atol=1e-2)
     assert np.allclose(h_solved, 0.0, atol=1e-2)
+    
+def test_reflection():
+    xMax = 1
+    xMin = -1
+    x = np.linspace(xMin, xMax, 201)
+    
+    x0 = 0.0
+    sigma = 0.05
+    initial_e = gaussian(x, x0, sigma)
+    
+    L = xMax - xMin
+    t_final = 2.0*L/C
+    
+    epsilon_r = 4.0
+    
+    epsilon = np.ones_like(x)
+    epsilon[x > L] = epsilon_r
+    
+    n1 = 1.0
+    n2 = np.sqrt(epsilon_r)
+    
+    R = (n1-n2)/(n1+n2)
+    T = 2.0*n1/(n1+n2)
+    
+    fdtd = FDTD1D(x, epsilon=epsilon)
+    fdtd.load_initial_field(initial_e)
+    fdtd.run_until(t_final)
+    
+    e_trans_solved, e_reflex_solved = fdtd.get_e()
+    
+    e_reflex_expected = initial_e*R
+    e_trans_expected = initial_e*T
+    
+    assert np.corrcoef(e_reflex_solved, e_reflex_expected)[0,1] > 0.99
+    assert np.corrcoef(e_trans_solved, e_trans_expected)[0,1] > 0.99
 
 
 if __name__ == "__main__":
