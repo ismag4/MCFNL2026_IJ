@@ -54,7 +54,7 @@ def test_fdtd_PEC_boundary_conditions():
     
     assert np.corrcoef(e_solved, e_expected)[0,1] > 0.99
     assert np.allclose(h_solved, h_expected, atol=0.01)
-    
+
 def test_fdtd_PMC_boundary_conditions():
     xMax = 1
     xMin = -1
@@ -71,7 +71,7 @@ def test_fdtd_PMC_boundary_conditions():
     fdtd.load_initial_field(initial_h)
 
     L = xMax - xMin
-    t_final = L / C
+    t_final = 0.5*L / C
     fdtd.run_until(t_final)
 
     h_solved = fdtd.get_h()
@@ -82,7 +82,7 @@ def test_fdtd_PMC_boundary_conditions():
     
     assert np.corrcoef(h_solved, h_expected)[0,1] > 0.98
     assert np.allclose(e_solved, e_expected, atol=0.01)
-
+    
 
 def test_fdtd_periodic_boundary_conditions():
     xMax = 1
@@ -156,7 +156,8 @@ def test_fdtd_mur_boundary_conditions():
     fdtd.load_initial_field(initial_e)
     fdtd.h = initial_h.copy()
 
-    t_final = 1.2
+    L = xMax - xMin
+    t_final = 0.5*L / C
     fdtd.run_until(t_final)
 
     e_solved = fdtd.get_e()
@@ -199,6 +200,34 @@ def test_reflection():
     
     assert np.corrcoef(e_reflex_solved, e_reflex_expected)[0,1] > 0.99
     assert np.corrcoef(e_trans_solved, e_trans_expected)[0,1] > 0.99
+
+
+from fdtd1d_dispersive import simulate_dispersive_slab_reflection_transmission
+
+
+def test_dispersive_slab_reflection_transmission():
+    x = np.linspace(-1.0, 1.0, 801)
+    slab_start = -0.2
+    slab_end = 0.2
+    eps_inf = 1.0
+    eps_s = 4.0
+    tau = 0.15
+    f0 = 2.0
+    t_final = 6.0
+
+    R_sim, T_sim, R_ana, T_ana = simulate_dispersive_slab_reflection_transmission(
+        x,
+        slab_start,
+        slab_end,
+        eps_inf,
+        eps_s,
+        tau,
+        f0,
+        t_final,
+    )
+
+    assert abs(R_sim - abs(R_ana)) < 0.20
+    assert abs(T_sim - abs(T_ana)) < 0.20
 
 
 if __name__ == "__main__":

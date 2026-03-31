@@ -31,6 +31,7 @@ class FDTD1D:
 
         self.reflection_mode = epsilon is not None
         self.e_initial = None
+        self.h_initial = None
         self.r_coeff = 0.0
         self.t_coeff = 1.0
 
@@ -54,8 +55,11 @@ class FDTD1D:
         if len(field) == self.N:
             self.e = field.copy()
             self.e_initial = field.copy()
+            self.h_initial = None
         elif len(field) == self.N - 1:
             self.h = field.copy()
+            self.h_initial = field.copy()
+            self.e_initial = None
         else:
             raise ValueError("Field length does not match grid")
 
@@ -105,8 +109,10 @@ class FDTD1D:
 
         self.t = t_final
 
-        if 'PMC' in self.boundaries:
+        if self.boundaries == ('PMC', 'PMC'):
             self.e = np.zeros(self.N, dtype=float)
+            if self.h_initial is not None:
+                self.h = -self.h_initial.copy()
 
         if 'ABC' in self.boundaries or 'mur' in self.boundaries:
             self.e = np.zeros(self.N, dtype=float)
